@@ -1,19 +1,20 @@
+import os
 import pickle
 import numpy as np
 
+# Get current file path
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Correct paths
+model_path = os.path.join(BASE_DIR, "..", "model", "model.pkl")
+scaler_path = os.path.join(BASE_DIR, "..", "model", "scaler.pkl")
+
 # Load model and scaler
-model = pickle.load(open("../model/model.pkl", "rb"))
-scaler = pickle.load(open("../model/scaler.pkl", "rb"))
+model = pickle.load(open(model_path, "rb"))
+scaler = pickle.load(open(scaler_path, "rb"))
 
 def predict_output(data):
-
-    # Convert input into numpy array
     data = np.array(data).reshape(1, -1)
-
-    # Scale the input
     data = scaler.transform(data)
-
-    # Predict using model
     prediction = model.predict(data)
-
     return float(prediction[0])
