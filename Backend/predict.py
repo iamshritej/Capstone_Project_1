@@ -3,20 +3,20 @@ import pickle
 import numpy as np
 
 # -------------------------------
-# Load Model (SAFE PATH HANDLING)
+# Load Model (CORRECT PATH)
 # -------------------------------
 current_dir = os.path.dirname(__file__)
 
-# Go to project root -> Model/model.pkl
+# Model is in root folder (same level as Backend)
 model_path = os.path.abspath(
-    os.path.join(current_dir, "..", "Model", "model.pkl")
+    os.path.join(current_dir, "..", "model", "model.pkl")
 )
 
-# Check if file exists (prevents crash)
+# Check if file exists
 if not os.path.exists(model_path):
     raise FileNotFoundError(f"Model file not found at: {model_path}")
 
-# Load model once (global)
+# Load model
 with open(model_path, "rb") as f:
     model = pickle.load(f)
 
@@ -25,27 +25,17 @@ with open(model_path, "rb") as f:
 # Prediction Function
 # -------------------------------
 def predict_output(input_data: dict):
-    """
-    input_data: dictionary coming from API (JSON)
-    Example:
-    {
-        "feature1": value1,
-        "feature2": value2,
-        ...
-    }
-    """
-
     try:
-        # Convert dict → ordered list (IMPORTANT: match training order)
-        features = list(input_data.values())
+        # If frontend sends {"data": [...]}
+        if "data" in input_data:
+            features = input_data["data"]
+        else:
+            features = list(input_data.values())
 
-        # Convert to numpy array & reshape for model
         final_input = np.array(features).reshape(1, -1)
 
-        # Prediction
         prediction = model.predict(final_input)
 
-        # If classification → return label
         return {
             "prediction": prediction[0]
         }
